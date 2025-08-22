@@ -3,8 +3,8 @@ import React from "react";
 
 const MenuContainer = ({ type, setType, title, icon }) => {
   return (
-    <View>
-      <View className="w-[90px] h-20 ">
+    <View className="">
+      <View className="w-[90px] h-24 ">
         <TouchableOpacity
           onPress={() => {
             setType(title.toLowerCase());
@@ -16,7 +16,12 @@ const MenuContainer = ({ type, setType, title, icon }) => {
             }`}
           >
             {icon}
-            <Text className="mt-2">{title}</Text>
+            <Text
+              style={{ fontFamily: "Baskerville", fontSize: 18 }}
+              className="mt-1"
+            >
+              {title}
+            </Text>
           </View>
         </TouchableOpacity>
       </View>

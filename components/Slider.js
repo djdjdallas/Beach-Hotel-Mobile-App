@@ -1,0 +1,20 @@
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import React from "react";
+import { Icon } from "react-native-elements";
+
+const Slider = ({ item }) => {
+  return (
+    <ScrollView className="">
+      <Image source={{ uri: item }} className="h-96 w-full" />
+    </ScrollView>
+  );
+};
+
+export default Slider;

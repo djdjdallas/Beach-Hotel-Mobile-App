@@ -1,9 +1,21 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import React from "react";
-
-const Tours = ({ imgUrl, title }) => {
+import { useNavigation } from "@react-navigation/native";
+const Tours = ({ imgUrl, title, descrip }) => {
+  const navigation = useNavigation();
   return (
-    <TouchableOpacity className="mr-3">
+    <TouchableOpacity
+      className="mr-3"
+      onPress={() =>
+        navigation.navigate("ToursPage", {
+          param: {
+            imgUrl,
+            title,
+            descrip,
+          },
+        })
+      }
+    >
       <Image
         source={{
           uri: imgUrl,
