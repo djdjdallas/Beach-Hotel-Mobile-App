@@ -1,70 +1,57 @@
+// API Configuration
 export const API_CONFIG = {
-  // Amadeus API Configuration
-  amadeus: {
-    baseURL: 'https://api.amadeus.com/v1',
-    authURL: 'https://api.amadeus.com/v1/security/oauth2/token',
-    clientId: process.env.EXPO_PUBLIC_AMADEUS_CLIENT_ID,
-    clientSecret: process.env.EXPO_PUBLIC_AMADEUS_CLIENT_SECRET,
-    endpoints: {
-      hotels: {
-        search: '/shopping/hotel-offers',
-        details: '/shopping/hotel-offers/by-hotel',
-        book: '/booking/hotel-bookings'
-      },
-      flights: {
-        search: '/shopping/flight-offers-search',
-        price: '/shopping/flight-offers/pricing',
-        book: '/booking/flight-orders'
-      }
-    }
+  // Toggle between mock data and real APIs
+  USE_MOCK_DATA: true,
+  
+  // Enable/disable external API integrations
+  USE_EXTERNAL_APIS: {
+    amadeus: false, // Set to true when you have valid Amadeus credentials
+    booking: false, // Set to true when you have valid Booking.com credentials
+    google: true,   // Google Maps API for location services
   },
-
-  // Booking.com API Configuration (via RapidAPI)
-  booking: {
-    baseURL: 'https://booking-com15.p.rapidapi.com/api/v1',
-    rapidAPIKey: process.env.EXPO_PUBLIC_BOOKING_RAPIDAPI_KEY,
-    rapidAPIHost: 'booking-com15.p.rapidapi.com',
-    endpoints: {
-      hotels: {
-        search: '/hotels/searchHotels',
-        details: '/hotels/getHotelDetails',
-        photos: '/hotels/getHotelPhotos',
-        reviews: '/hotels/getHotelReviews'
-      },
-      destinations: {
-        search: '/hotels/searchDestination'
-      }
-    }
+  
+  // API endpoints
+  ENDPOINTS: {
+    BASE_URL: process.env.API_BASE_URL || 'https://api.roamly.com',
+    AMADEUS_BASE: 'https://test.api.amadeus.com/v2',
+    BOOKING_BASE: 'https://booking-com.p.rapidapi.com/v1',
   },
-
-  // Skyscanner API Configuration (via RapidAPI)
-  skyscanner: {
-    baseURL: 'https://sky-scanner3.p.rapidapi.com/flights',
-    rapidAPIKey: process.env.EXPO_PUBLIC_SKYSCANNER_RAPIDAPI_KEY,
-    rapidAPIHost: 'sky-scanner3.p.rapidapi.com',
-    endpoints: {
-      searchAirports: '/search-airports',
-      searchFlights: '/search-multi-city',
-      priceCalendar: '/price-calendar'
-    }
+  
+  // Cache settings
+  CACHE: {
+    ENABLED: true,
+    EXPIRY_TIME: 5 * 60 * 1000, // 5 minutes
+    KEYS: {
+      POPULAR_DESTINATIONS: 'popular_destinations',
+      CATEGORIES: 'categories',
+      FAVORITES: 'favorites',
+      HOTELS: 'hotels',
+      RESTAURANTS: 'restaurants',
+      ATTRACTIONS: 'attractions',
+      SHOPPING: 'shopping',
+    },
   },
-
-  // Common configuration
-  common: {
-    timeout: 30000,
-    retryAttempts: 3,
-    cacheTimeout: 300000, // 5 minutes
-  }
+  
+  // Request timeouts
+  TIMEOUTS: {
+    DEFAULT: 10000, // 10 seconds
+    SEARCH: 15000,  // 15 seconds for search operations
+    EXTERNAL_API: 20000, // 20 seconds for external APIs
+  },
+  
+  // Retry configuration
+  RETRY: {
+    ATTEMPTS: 2,
+    DELAY: 1000, // 1 second
+  },
 };
 
-export const API_HEADERS = {
-  amadeus: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  },
-  rapidAPI: {
-    'Content-Type': 'application/json',
-    'X-RapidAPI-Key': process.env.EXPO_PUBLIC_RAPIDAPI_KEY,
-    'X-RapidAPI-Host': ''
-  }
+// Helper to check if we should use real APIs
+export const shouldUseRealAPI = (apiType) => {
+  return !API_CONFIG.USE_MOCK_DATA && API_CONFIG.USE_EXTERNAL_APIS[apiType];
+};
+
+// Helper to get API endpoint
+export const getAPIEndpoint = (path) => {
+  return `${API_CONFIG.ENDPOINTS.BASE_URL}${path}`;
 };

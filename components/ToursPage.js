@@ -1,7 +1,7 @@
 import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import React, { useLayoutEffect } from "react";
 
-import { Icon } from "react-native-elements";
+import { Icon } from '@rneui/themed';
 import ReviewsSections from "./ReviewsSections";
 
 import LocationSection from "./LocationSection";

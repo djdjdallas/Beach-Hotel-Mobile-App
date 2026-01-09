@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React, { useCallback, useLayoutEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "react-native-elements";
+import { Icon } from '@rneui/themed';
 
 import ReviewsSections from "../components/ReviewsSections";
 import SearchResults from "../components/SearchResults";

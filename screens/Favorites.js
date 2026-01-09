@@ -1,203 +1,174 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   SafeAreaView,
   FlatList,
   TouchableOpacity,
-  StyleSheet,
-  Platform,
+  Image,
+  StatusBar,
+  ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { Icon } from 'react-native-elements';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import EnhancedSearchResults from '../components/EnhancedSearchResults';
-import searchService from '../services/searchService';
-import locationService from '../services/locationService';
+import { useNavigation } from '@react-navigation/native';
+import {
+  HeartIcon,
+  StarIcon,
+  MapPinIcon,
+  XMarkIcon,
+} from 'react-native-heroicons/solid';
+import * as Animatable from 'react-native-animatable';
+import { useFavorites } from '../hooks/useApi';
 
 const Favorites = () => {
   const navigation = useNavigation();
-  const [favorites, setFavorites] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [userLocation, setUserLocation] = useState(null);
+  const { favorites, loading, error, removeFavorite: removeFromAPI, refetch } = useFavorites();
 
-  useFocusEffect(
-    React.useCallback(() => {
-      loadFavorites();
-      getUserLocation();
-    }, [])
+  const removeFavorite = async (id) => {
+    try {
+      await removeFromAPI(id);
+    } catch (error) {
+      console.error('Error removing favorite:', error);
+    }
+  };
+
+  const renderFavorite = ({ item, index }) => (
+    <Animatable.View
+      animation="fadeInUp"
+      delay={index * 100}
+      className="mx-5 mb-4"
+    >
+      <TouchableOpacity
+        className="bg-white rounded-2xl shadow-sm overflow-hidden"
+        activeOpacity={0.9}
+        onPress={() => navigation.navigate('PromoCard', { data: item })}
+      >
+        <View className="flex-row">
+          <Image
+            source={{ uri: item.image }}
+            className="w-28 h-28"
+          />
+          <View className="flex-1 p-4">
+            <View className="flex-row justify-between items-start">
+              <View className="flex-1">
+                <View className="flex-row items-center mb-1">
+                  <Text className="text-xs text-[#69DC9E] font-semibold uppercase">
+                    {item.type}
+                  </Text>
+                </View>
+                <Text className="text-gray-900 font-bold text-base" numberOfLines={1}>
+                  {item.name}
+                </Text>
+                <View className="flex-row items-center mt-1">
+                  <MapPinIcon size={12} color="#6B7280" />
+                  <Text className="text-gray-600 text-xs ml-1" numberOfLines={1}>
+                    {item.location}
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                onPress={() => removeFavorite(item.id)}
+                className="ml-2"
+              >
+                <XMarkIcon size={20} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+            
+            <View className="flex-row items-center justify-between mt-2">
+              <View className="flex-row items-center">
+                <StarIcon size={14} color="#FFC107" />
+                <Text className="text-gray-700 text-sm font-medium ml-1">
+                  {item.rating}
+                </Text>
+                <Text className="text-gray-500 text-xs ml-1">
+                  ({item.reviews})
+                </Text>
+              </View>
+              {item.price && (
+                <Text className="text-[#69DC9E] font-bold">
+                  {item.price}
+                </Text>
+              )}
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </Animatable.View>
   );
 
-  const getUserLocation = async () => {
-    try {
-      const hasPermission = await locationService.checkPermissions();
-      if (hasPermission) {
-        const location = await locationService.getCurrentLocation();
-        setUserLocation({
-          lat: location.latitude,
-          lng: location.longitude,
-        });
-      }
-    } catch (error) {
-      console.log('Location permission not granted or error:', error);
-    }
-  };
-
-  const loadFavorites = async () => {
-    try {
-      const favs = await searchService.getFavorites();
-      setFavorites(favs);
-    } catch (error) {
-      console.error('Error loading favorites:', error);
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    loadFavorites();
-  };
-
-  const navigateToDetails = (favorite) => {
-    navigation.navigate('PromoCard', {
-      param: {
-        data: { place_id: favorite.placeId },
-        imgUrl: favorite.imgUrl,
-        title: favorite.title,
-        location: favorite.location,
-        lat: favorite.lat,
-        long: favorite.long,
-        rating: favorite.rating,
-        type: favorite.type,
-        isFavorite: true,
-      },
-    });
-  };
-
-  const renderEmptyState = () => (
-    <View style={styles.emptyContainer}>
-      <Icon name="favorite-border" type="material" color="#ccc" size={80} />
-      <Text style={styles.emptyTitle}>No favorites yet</Text>
-      <Text style={styles.emptySubtitle}>
-        Start exploring and save your favorite places
+  const EmptyFavorites = () => (
+    <View className="flex-1 justify-center items-center px-8">
+      <HeartIcon size={80} color="#E5E7EB" />
+      <Text className="text-gray-900 text-xl font-bold mt-4">
+        No favorites yet
+      </Text>
+      <Text className="text-gray-600 text-center mt-2">
+        Start exploring and tap the heart icon on places you love to save them here
       </Text>
       <TouchableOpacity
-        style={styles.exploreButton}
-        onPress={() => navigation.navigate('Home')}
+        className="bg-[#69DC9E] px-6 py-3 rounded-full mt-6"
+        onPress={() => navigation.navigate('HomeTab')}
       >
-        <Text style={styles.exploreButtonText}>Explore Now</Text>
+        <Text className="text-white font-semibold">Start Exploring</Text>
       </TouchableOpacity>
     </View>
   );
 
-  const renderFavoriteItem = ({ item, index }) => (
-    <TouchableOpacity onPress={() => navigateToDetails(item)}>
-      <EnhancedSearchResults
-        index={index}
-        data={{ place_id: item.placeId }}
-        title={item.title}
-        imgUrl={item.imgUrl}
-        location={item.location}
-        lat={item.lat}
-        long={item.long}
-        rating={item.rating}
-        type={item.type}
-        userLocation={userLocation}
-      />
-    </TouchableOpacity>
-  );
-
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Favorites</Text>
-        <Text style={styles.headerSubtitle}>
-          {favorites.length} {favorites.length === 1 ? 'place' : 'places'} saved
+    <SafeAreaView className="flex-1 bg-gray-50">
+      <StatusBar barStyle="dark-content" />
+      
+      {/* Header */}
+      <View className="bg-white px-5 py-4 border-b border-gray-100">
+        <Text className="text-2xl font-bold text-gray-900">My Favorites</Text>
+        <Text className="text-gray-600 text-sm mt-1">
+          {favorites?.length || 0} {favorites?.length === 1 ? 'place' : 'places'} saved
         </Text>
       </View>
 
-      {favorites.length > 0 ? (
+      {/* Loading State */}
+      {loading && !favorites ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#69DC9E" />
+          <Text className="text-gray-600 mt-4">Loading your favorites...</Text>
+        </View>
+      ) : error ? (
+        <View className="flex-1 justify-center items-center px-8">
+          <Text className="text-gray-900 text-lg font-semibold mb-2">Oops!</Text>
+          <Text className="text-gray-600 text-center mb-4">
+            We couldn't load your favorites. Please try again.
+          </Text>
+          <TouchableOpacity
+            className="bg-[#69DC9E] px-6 py-3 rounded-full"
+            onPress={refetch}
+          >
+            <Text className="text-white font-semibold">Retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        /* Favorites List */
         <FlatList
-          data={favorites}
-          keyExtractor={(item) => item.placeId}
-          renderItem={renderFavoriteItem}
+          data={favorites || []}
+          renderItem={renderFavorite}
+          keyExtractor={(item) => item.id}
+          ListEmptyComponent={EmptyFavorites}
+          contentContainerStyle={{
+            paddingTop: 16,
+            paddingBottom: 100,
+            flexGrow: 1,
+          }}
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={['#69DC9E']}
+              refreshing={loading && !!favorites}
+              onRefresh={refetch}
               tintColor="#69DC9E"
             />
           }
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
         />
-      ) : (
-        renderEmptyState()
       )}
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  header: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    fontFamily: Platform.OS === 'ios' ? 'Baskerville' : 'serif',
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 5,
-    fontFamily: Platform.OS === 'ios' ? 'Baskerville' : 'serif',
-  },
-  listContainer: {
-    paddingBottom: 100,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  emptyTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333',
-    marginTop: 20,
-    fontFamily: Platform.OS === 'ios' ? 'Baskerville' : 'serif',
-  },
-  emptySubtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 10,
-    textAlign: 'center',
-    fontFamily: Platform.OS === 'ios' ? 'Baskerville' : 'serif',
-  },
-  exploreButton: {
-    marginTop: 30,
-    backgroundColor: '#69DC9E',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 25,
-  },
-  exploreButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
-    fontFamily: Platform.OS === 'ios' ? 'Baskerville' : 'serif',
-  },
-});
 
 export default Favorites;

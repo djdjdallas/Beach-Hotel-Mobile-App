@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import React from "react";
-import { Icon } from "react-native-elements";
+import { Icon } from '@rneui/themed';
 
 const Description = ({ type, title, subDes }) => {
   return (

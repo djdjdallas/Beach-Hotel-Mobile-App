@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import React from "react";
-import { Icon } from "react-native-elements/dist/icons/Icon";
+import { Icon } from "@rneui/themed";
 import { useNavigation } from "@react-navigation/native";
 
 const SearchResults = ({

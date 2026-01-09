@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import React, { useLayoutEffect, useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "react-native-elements";
+import { Icon } from '@rneui/themed';
 import EnhancedSearch from "./EnhancedSearch";
 import EnhancedSearchResults from "./EnhancedSearchResults";
 import SearchFilters from "./SearchFilters";

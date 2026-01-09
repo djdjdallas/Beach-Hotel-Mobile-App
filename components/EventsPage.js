@@ -1,7 +1,7 @@
 import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import React, { useLayoutEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "react-native-elements";
+import { Icon } from '@rneui/themed';
 import MapView, { Marker } from "react-native-maps";
 
 const EventsPage = ({ route }) => {

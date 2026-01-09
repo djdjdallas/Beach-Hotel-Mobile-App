@@ -10,7 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { Icon } from 'react-native-elements';
+import { Icon } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 import searchService from '../services/searchService';
 import locationService from '../services/locationService';

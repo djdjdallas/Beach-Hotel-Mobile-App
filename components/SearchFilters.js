@@ -8,7 +8,7 @@ import {
   Modal,
   Platform,
 } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { Icon } from '@rneui/themed';
 import { Slider } from '@rneui/themed';
 
 const SearchFilters = ({ filters, onFiltersChange, onClose, visible }) => {

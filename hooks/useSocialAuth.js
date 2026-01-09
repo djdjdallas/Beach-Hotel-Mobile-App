@@ -14,24 +14,26 @@ export const useSocialAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Google Auth
-  const [googleRequest, googleResponse, googlePromptAsync] = Google.useAuthRequest({
-    expoClientId: AUTH_CONFIG.google.expoClientId,
-    iosClientId: AUTH_CONFIG.google.iosClientId,
-    androidClientId: AUTH_CONFIG.google.androidClientId,
-    webClientId: AUTH_CONFIG.google.webClientId,
-  });
+  const [googleRequest, googleResponse, googlePromptAsync] = Google?.useAuthRequest ? 
+    Google.useAuthRequest({
+      expoClientId: AUTH_CONFIG.google.expoClientId,
+      iosClientId: AUTH_CONFIG.google.iosClientId,
+      androidClientId: AUTH_CONFIG.google.androidClientId,
+      webClientId: AUTH_CONFIG.google.webClientId,
+    }) : [null, null, () => {}];
 
   // Facebook Auth
-  const [facebookRequest, facebookResponse, facebookPromptAsync] = Facebook.useAuthRequest({
-    clientId: AUTH_CONFIG.facebook.appId,
-    responseType: Facebook.ResponseType.Token,
-  });
+  const [facebookRequest, facebookResponse, facebookPromptAsync] = Facebook?.useAuthRequest ? 
+    Facebook.useAuthRequest({
+      clientId: AUTH_CONFIG.facebook.appId,
+      responseType: 'token',
+    }) : [null, null, () => {}];
 
   // Handle Google response
   useEffect(() => {
     if (googleResponse?.type === 'success') {
       const { authentication } = googleResponse;
-      handleSocialLogin('google', authentication.accessToken);
+      handleSocialLogin('google', authentication?.accessToken);
     }
   }, [googleResponse]);
 
@@ -39,7 +41,7 @@ export const useSocialAuth = () => {
   useEffect(() => {
     if (facebookResponse?.type === 'success') {
       const { authentication } = facebookResponse;
-      handleSocialLogin('facebook', authentication.accessToken);
+      handleSocialLogin('facebook', authentication?.accessToken);
     }
   }, [facebookResponse]);
 

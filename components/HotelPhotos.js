@@ -5,7 +5,7 @@ import "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "react-native-elements";
+import { Icon } from '@rneui/themed';
 import Slider from "./Slider";
 const HotelPhotos = () => {
   const { width } = Dimensions.get("window");
